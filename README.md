@@ -1,16 +1,16 @@
 ## Compliance QA Pipeline
 
-End-to-end real-time compliance auditing for logistics video streams using Azure AI Vision, Azure OpenAI, and Azure AI Search. Exposes a FastAPI API and a CLI runner.
+End-to-end compliance auditing for logistics video streams/files using Azure AI Vision, Azure OpenAI, and Azure AI Search. Exposes a FastAPI API and a CLI runner.
 
 ### What It Does
-- Samples frames from a live stream (RTSP/USB/video file)
+- Samples frames from a live stream or video file (RTSP/HTTP/Google Drive/local file)
 - Uses Azure AI Vision to describe the scene + OCR
 - Retrieves relevant regulations from Azure AI Search (RAG)
-- Runs compliance audit using Azure OpenAI
+- Runs a compliance audit using Azure OpenAI
 
 ### Requirements
 - Python 3.13+
-- Azure resources configured (Video Indexer, OpenAI, Search, Monitor)
+- Azure resources configured (Vision, OpenAI, Search, Monitor)
 
 ### Setup
 1. Create and activate a virtual environment.
@@ -29,6 +29,12 @@ uv run uvicorn backend.src.api.server:app
 
 ### Run the CLI
 ```bash
+uv run python main.py --video-url "https://drive.google.com/file/d/<FILE_ID>/view?usp=sharing"
+```
+
+Or set an environment variable and run:
+```bash
+set COMPLIANCE_VIDEO_URL=https://drive.google.com/file/d/<FILE_ID>/view?usp=sharing
 uv run python main.py
 ```
 
@@ -49,8 +55,14 @@ Required:
 Optional:
 - `OTEL_SERVICE_NAME`
 - `OTEL_TRACES_SAMPLER`, `OTEL_TRACES_SAMPLER_ARG`
-- `VI_CONNECT_TIMEOUT`, `VI_READ_TIMEOUT`
 - `AZURE_VISION_API_VERSION`
+- `COMPLIANCE_VIDEO_URL` (default video URL for CLI)
+
+### Video Indexer (Optional)
+The current workflow does not call Azure Video Indexer. If you plan to add it, you can use the following optional settings:
+- `AZURE_VI_NAME`, `AZURE_VI_ACCOUNT_ID`, `AZURE_VI_LOCATION`
+- `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP`
+- `VI_CONNECT_TIMEOUT`, `VI_READ_TIMEOUT`
 
 ### Troubleshooting
 **Azure Vision errors:**
