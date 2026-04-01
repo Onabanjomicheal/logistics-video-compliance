@@ -12,6 +12,8 @@ compliance audit workflow. Think of it as the master switch that:
 import uuid
 import json
 import logging
+import os
+import argparse
 
 from dotenv import load_dotenv
 
@@ -27,7 +29,7 @@ logging.basicConfig(
 logger = logging.getLogger("logistic-compliance-runner")
 
 
-def run_cli_simulation():
+def run_cli_simulation(video_url: str):
     """
     Simulates the video compliance audit request.
 
@@ -40,7 +42,7 @@ def run_cli_simulation():
 
     # define the initial state
     initial_inputs = {
-        "video_url": "rtsp://your-camera-stream",
+        "video_url": video_url,
         "video_id": f"vid_{session_id[:8]}",
         "sample_interval_sec": 2,
         "max_frames": 5,
@@ -80,7 +82,25 @@ def run_cli_simulation():
 
 
 if __name__ == "__main__":
-    run_cli_simulation()
+    parser = argparse.ArgumentParser(description="Run Compliance QA Pipeline")
+    parser.add_argument(
+        "--video-url",
+        dest="video_url",
+        default=None,
+        help="RTSP/HTTP/Google Drive URL or local file path to a video",
+    )
+    args = parser.parse_args()
+
+    env_video_url = os.getenv("COMPLIANCE_VIDEO_URL") or os.getenv("VIDEO_URL")
+    video_url = args.video_url or env_video_url or "rtsp://your-camera-stream"
+
+    if video_url == "rtsp://your-camera-stream":
+        raise ValueError(
+            "No real video stream provided. Set COMPLIANCE_VIDEO_URL (or VIDEO_URL) "
+            "or pass --video-url <path_or_url>."
+        )
+
+    run_cli_simulation(video_url)
 
 
 
